@@ -1,0 +1,3 @@
+app:
+  propertiesBasePath: /quique/docs/qqvideotagger/properties
+  tagsRelativePath: tags
