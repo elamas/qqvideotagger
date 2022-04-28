@@ -22,17 +22,37 @@ import qqvideotagger.util.CSVUtil;
 @Service
 public class FileStorageService implements StorageService {
 	
+	public enum Operation {
+	    ADD,
+	    REMOVE; 
+	}
+	
 	@Autowired
 	private FileStorageServiceUtil fileStorageServiceUtil;
 
 	@Override
-	//TODO implementar
-	public void addTagToVideo(String container, String video, String tag) {
-		
+	public void addTagToVideo(String container, String video, String tag) throws IOException {
+		addTagsToVideo(
+				container, //String container, 
+				video, //String video, 
+				List.of(tag) //List<String> tags
+				);
+	}
+	
+	@Override
+	//para no repetir codigo hago un unico metodo para anadir o eliminar
+	public void addTagsToVideo(String container, String video, List<String> tags) throws IOException {
+		addOrRemoveTagsToVideo(
+				container, //String container, 
+				video, //String video, 
+				tags, //List<String> tags, 
+				Operation.ADD //Operation operation
+				);
 	}
 
-	@Override
-	public void addTagsToVideo(String container, String video, List<String> tags) throws IOException {
+
+	//para no repetir codigo hago un unico metodo para anadir o eliminar
+	private void addOrRemoveTagsToVideo(String container, String video, List<String> tags, Operation operation) throws IOException {
 		String propsPath = fileStorageServiceUtil.getPropertiesContainerPath(container);
 		File fProps = new File(propsPath);
 		Properties props = new Properties();
@@ -54,9 +74,19 @@ public class FileStorageService implements StorageService {
 			CSVUtil.loadCsvToSet(tagSet, videoTags);
 		}
 		
-		//anadimos las nuevas
-		tagSet.addAll(tags);
-		props.setProperty(video, CSVUtil.setToCSV(tagSet));
+		if (operation.equals(Operation.ADD)) {
+			//anadimos las nuevas
+			tagSet.addAll(tags);
+		} else if (operation.equals(Operation.REMOVE)) {
+			tagSet.removeAll(tags);
+		}
+		 
+		//si un video se queda sin etiquetas borro la property
+		if (tagSet.isEmpty() && props.getProperty(video) != null) {
+			props.remove(video);
+		} else {
+			props.setProperty(video, CSVUtil.setToCSV(tagSet));
+		}
 		
 		//guardamos el properties
 		fProps.getParentFile().mkdirs();
@@ -68,10 +98,13 @@ public class FileStorageService implements StorageService {
 		} 
 	}
 	
-	//TODO implementar
-	//TODO si un video se queda sin etiquetas borrar la property
-	public void removeTagFromVideo(String container, String video, String tag) {
-		
+	public void removeTagFromVideo(String container, String video, String tag) throws IOException {
+		addOrRemoveTagsToVideo(
+				container, //String container, 
+				video, //String video, 
+				List.of(tag), //List<String> tags, 
+				Operation.REMOVE //Operation operation
+				);
 	}
 
 }

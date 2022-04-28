@@ -193,4 +193,50 @@ class FileStorageServiceTest {
 		propertiesContainerFile.delete();
 	}
 
+	//existe la foto en el archivo y tiene etiquetas
+	@Test
+	void test_addTagToVideo() throws IOException {
+		String container = "mycontainer";
+		String video = "myvideo.mp4";
+		String tag = "coche";
+		
+		String propertiesContainerPath = fileStorageServiceUtil.getPropertiesContainerPath(container);
+		log.info("[FileStorageServiceTest - test_addTagsToVideo_01]propertiesContainerPath: {}", propertiesContainerPath);
+		
+		//borro el archivo si existia
+		File propertiesContainerFile = new File(propertiesContainerPath);
+		if (propertiesContainerFile.exists()) {
+			propertiesContainerFile.delete();
+		}
+		assertFalse(propertiesContainerFile.exists());
+
+		//lo creo de nuevo vacio
+		propertiesContainerFile.createNewFile();
+		assertTrue(propertiesContainerFile.exists());
+		
+		//le meto un video con etiquetas
+		FileUtils.write(propertiesContainerFile, "#Thu Apr 28 14:07:37 CEST 2022\n", StandardCharsets.UTF_8, true);
+		FileUtils.write(propertiesContainerFile, "lalala.mp4=lalala,lelele\n", StandardCharsets.UTF_8, true);
+		//le meto el video con etiquetas
+		FileUtils.write(propertiesContainerFile, video + "=avion,lampara,vela\n", StandardCharsets.UTF_8, true);
+		
+		//anadimos las etiquetas
+		fileStorageService.addTagToVideo(
+				container, //String container, 
+				video, //String video, 
+				tag //String tag
+				);
+		
+		//como no tengo metodo todavia de lectura compruebo el contenido a mano
+		assertTrue(propertiesContainerFile.exists());
+		String content = FileUtils.readFileToString(propertiesContainerFile, StandardCharsets.UTF_8);
+		log.info("[FileStorageServiceTest - test_addTagsToVideo_04]content: {}", content);
+		//assertTrue(content.contains("#Thu Apr 28 14:07:37 CEST 2022"));//lo comento porque se ve que cambia al actualizar
+		assertTrue(content.contains("lalala.mp4=lalala,lelele"));
+		assertTrue(content.contains("myvideo.mp4=avion,coche,lampara,vela"));//en orden alfabetico
+		
+		//borramos el archivo
+		propertiesContainerFile.delete();
+	}
+
 }
