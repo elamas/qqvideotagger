@@ -59,6 +59,7 @@ public class FileStorageService implements StorageService {
 		props.setProperty(video, CSVUtil.setToCSV(tagSet));
 		
 		//guardamos el properties
+		fProps.getParentFile().mkdirs();
 		try (OutputStream os = new FileOutputStream(fProps)) {
 			props.store(
 					os, 
@@ -68,6 +69,7 @@ public class FileStorageService implements StorageService {
 	}
 	
 	//TODO implementar
+	//TODO si un video se queda sin etiquetas borrar la property
 	public void removeTagFromVideo(String container, String video, String tag) {
 		
 	}
