@@ -13,4 +13,10 @@ public class CSVUtil {
 	public static String setToCSV(Set<String> set) {
 		return String.join(",", set);
 	}
+	
+	public static List<String> csvToList(String csv) {
+		String[] csvSplitted = csv.split(",");
+		return List.of(csvSplitted);
+	}
+
 }

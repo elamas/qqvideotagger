@@ -14,5 +14,6 @@ public interface StorageService {
 	
 	public void removeTagFromVideo(String container, String video, String tag) throws IOException;
 
+	public List<String> getTagsFromVideo(String container, String video) throws IOException;
 
 }

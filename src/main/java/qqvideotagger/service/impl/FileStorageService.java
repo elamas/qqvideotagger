@@ -2,11 +2,11 @@ package qqvideotagger.service.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -105,6 +105,29 @@ public class FileStorageService implements StorageService {
 				List.of(tag), //List<String> tags, 
 				Operation.REMOVE //Operation operation
 				);
+	}
+
+	@Override
+	public List<String> getTagsFromVideo(String container, String video) throws IOException {
+		String propsPath = fileStorageServiceUtil.getPropertiesContainerPath(container);
+		File fProps = new File(propsPath);
+		Properties props = new Properties();
+		
+		//cargamos el properties del container si existe
+		if (fProps.exists()) {
+			try (InputStream is = new FileInputStream(fProps)) {
+				props.load(is);
+			}
+		}
+		
+		//obtenemos la property del video
+		String videoTags = props.getProperty(video);
+		if (videoTags != null) {
+			return CSVUtil.csvToList(videoTags);
+		} else {
+			return Collections.emptyList();//segun el sonarlint es mejor devolver una lista vacia que u null
+		}
+		
 	}
 
 }
