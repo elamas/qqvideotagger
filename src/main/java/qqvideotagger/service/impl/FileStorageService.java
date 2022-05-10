@@ -22,7 +22,7 @@ import qqvideotagger.util.CSVUtil;
 @Service
 public class FileStorageService implements StorageService {
 	
-	public enum Operation {
+	private enum Operation {
 	    ADD,
 	    REMOVE; 
 	}
